@@ -1,12 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import DragBox from './DragBox';
 
 function FirstContainer() {
+
+  const [boxes, setBoxes] = useState([
+    {
+      name: 1
+    },
+    {
+      name: 2
+    },
+    {
+      name: 3
+    }
+  ]);
+
   return (
     <div className='bg-red-700 h-full w-full flex flex-col justify-center items-center'>
-      <DragBox uid={1}/>
-      <DragBox uid={2} />
-      <DragBox uid={3} />
+      {boxes.map((box, i) => <DragBox item={box} key={i} />)}
     </div>
   )
 }

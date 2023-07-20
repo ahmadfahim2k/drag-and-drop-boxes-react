@@ -1,23 +1,23 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDrop } from 'react-dnd';
 import { ItemTypes } from '../ItemTypes';
 
-function SecondContainer() {
+function SecondContainer({ onDrop, children, status }) {
 
-  const [boxes, setBoxes] = useState([]);
-
-  const [{ canDrop, isOver }, drop] = useDrop(() => ({
+  const [{ isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.BOX,
-    drop: () => ({ name: 'Blue Container' }),
+    drop: (item, monitor) => {
+      onDrop(item, monitor, status);
+    },
     collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
+      isOver: !!monitor.isOver(),
     }),
   }))
 
   return (
-    <div ref={drop} className='bg-blue-700 h-full w-full flex justify-center items-center'>
+    <div ref={drop} className='bg-blue-700 h-full w-full flex flex-col justify-center items-center'>
       SecondContainer
+      {children}
     </div>
   )
 }

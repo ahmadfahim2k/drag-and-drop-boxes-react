@@ -1,28 +1,54 @@
-import React from 'react'
-import { useDrag } from 'react-dnd';
+import React, { useRef } from 'react'
+import { useDrag, useDrop } from 'react-dnd';
 import { ItemTypes } from '../ItemTypes';
 
-function DragBox({ uid }) {
+function DragBox({  item, index, moveItem } ) {
 
-    const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
-        type: ItemTypes.BOX,
-        item: { uid },
-        // The collect function utilizes a "monitor" instance (see the Overview for what this is)
-        // to pull important pieces of state from the DnD system.
-        collect: (monitor) => ({
-            isDragging: monitor.isDragging()
-        }),
-        end: (item, monitor) => {
-            const dropResult = monitor.getDropResult()
-            if (item && dropResult) {
-              alert(`You dropped ${item.uid} into ${dropResult.name}!`)
+    const ref = useRef(null);
+
+    const [, drop] = useDrop({
+        accept: ItemTypes.BOX,
+        hover(item, monitor) {
+            if (!ref.current) {
+                return
             }
-          },
+            const dragIndex = item.index;
+            const hoverIndex = index;
+
+            if (dragIndex === hoverIndex) {
+                return
+            }
+
+            const hoveredRect = ref.current.getBoundingClientRect();
+            const hoverMiddleY = (hoveredRect.bottom - hoveredRect.top) / 2;
+            const mousePosition = monitor.getClientOffset();
+            const hoverClientY = mousePosition.y - hoveredRect.top;
+
+            if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+                return;
+            }
+
+            if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+                return;
+            }
+            moveItem(dragIndex, hoverIndex);
+            item.index = hoverIndex;
+        },
+    });
+
+    const [{ isDragging }, drag] = useDrag(() => ({
+        type: ItemTypes.BOX,
+        item: { ...item },
+        collect: (monitor) => ({
+            isDragging: !!monitor.isDragging()
+        }),
     }));
 
+    drag(drop(ref));
+
     return (
-        <div className='m-2 p-2 w-20 h-20 bg-black text-white hover:cursor-pointer flex justify-center items-center' ref={drag}>
-            DragBox
+        <div className={`m-2 p-2 w-20 h-20 bg-black text-white text-3xl hover:cursor-pointer flex justify-center items-center opacity-${isDragging ? 0 : 100}`} ref={ref}>
+            {item.name}
         </div>
     )
 }
