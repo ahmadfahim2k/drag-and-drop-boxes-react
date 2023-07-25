@@ -1,11 +1,11 @@
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { dataAtom, filteredDataSelector } from '../Recoil';
+import { dragDataAtom, filteredDragDataSelector } from '../Recoil';
 import DragBox from './DragBox';
 
 function Container({ color }) {
 
-    const boxes = useRecoilValue(filteredDataSelector(color));
-    const setData = useSetRecoilState(dataAtom);
+    const boxes = useRecoilValue(filteredDragDataSelector(color));
+    const setDragData = useSetRecoilState(dragDataAtom);
 
     function handleDragEnter(e) {
         e.preventDefault();
@@ -18,8 +18,8 @@ function Container({ color }) {
 
     function handleDrop(e) {
         const item = JSON.parse(e.dataTransfer.getData("item"));
-        console.log(item);
-        setData(prev => {
+        // console.log(item);
+        setDragData(prev => {
 
             const newData = {};
             //remove from data
@@ -32,12 +32,20 @@ function Container({ color }) {
             return newData;
         });
         e.preventDefault();
-      }
+    }
+
+    function formatString(str) {
+        return str.replace(/\b\w/g, (match) => match.toUpperCase());
+    }
 
     return (
-        <div className={`bg-${color}-700 h-full w-full flex flex-col justify-center items-center`} onDragEnter={handleDragEnter} onDragOver={handleDragOver} onDrop={handleDrop}>
-            {`${color} container`}
-            {boxes.map((box, i) => <DragBox item={box} key={i} />)}
+        <div className={`p-2 border-2 min-h-[400px] rounded-md border-${color}-700 shadow-xl h-full w-full flex flex-col justify-start items-center`} onDragEnter={handleDragEnter} onDragOver={handleDragOver} onDrop={handleDrop}>
+            <div className={`border-b-2 border-${color}-700 w-full flex justify-center`}>
+                <span className='text-xl font-semibold select-none'>{formatString(`${color} container`)}</span>
+            </div>
+            <div className='mt-4 flex flex-col justify-center items-center'>
+                {boxes.map((box, i) => <DragBox item={box} key={i} />)}
+            </div>
         </div>
     )
 }

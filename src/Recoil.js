@@ -1,41 +1,46 @@
 import { atom, selectorFamily } from "recoil";
 
-export const dataAtom = atom({
-  key: 'data',
+export const dragBoxInputAtom = atom({
+  key: 'dragBoxInput',
+  default: ''
+});
+
+export const dragDataAtom = atom({
+  key: 'dragData',
   default: {
     'red': [{
-      name: 'A'
+      name: 'Apple'
     },
     {
-      name: 'B'
+      name: 'Banana'
     },
     {
-      name: 'C'
+      name: 'Cat'
     },
     ],
     'blue': [
       {
-        name: 'D'
+        name: 'Dog'
       },
       {
-        name: 'E'
+        name: 'Elephant'
       },
       {
-        name: 'F'
+        name: 'Fruits'
       }
     ],
     'green': [],
-    // 'yellow': [],
+    'yellow': [],
     // 'orange': []
   }
 });
 
-export const filteredDataSelector = selectorFamily({
-  key: 'filteredDataSelector',
+export const filteredDragDataSelector = selectorFamily({
+  key: 'filteredDragDataSelector',
   get: (color) => ({ get }) => {
-    const data = get(dataAtom);
+    const dragData = get(dragDataAtom);
 
     //filtering
-    return data[color];
+    return dragData[color];
   }
 });
