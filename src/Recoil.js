@@ -1,5 +1,6 @@
 import { atom, selector, selectorFamily } from "recoil";
 
+//drag drop atoms & selectors
 export const dragBoxInputAtom = atom({
   key: 'dragBoxInput',
   default: ''
@@ -45,6 +46,7 @@ export const filteredDragDataSelector = selectorFamily({
   }
 });
 
+//table search data atoms & selectors
 export const userDataAtom = atom({
   key: 'userData',
   default: [
@@ -57,7 +59,7 @@ export const userDataAtom = atom({
       "city": "Zalantun",
       "country": "China",
       "dob": "20/12/2000"
-  }
+    }
   ]
 });
 
@@ -71,6 +73,24 @@ export const userDataHeadersSelector = selector({
   }
 });
 
+export const activeColumnsAtom = atom({
+  key: 'activeColumns',
+  default: [
+    "id", "first_name", "last_name", "email", "phone", "city", "country","dob"
+  ]
+});
+
+export const activeHeadersSelector = selector({
+  key: 'activeHeaders',
+  get: ({ get }) => {
+    const allHeaders = get(userDataHeadersSelector);
+    const activeHeaders = get(activeColumnsAtom);
+
+    //filtering
+    return allHeaders.filter(header => activeHeaders.includes(header));
+  }
+})
+
 export const userDataSearchAtom = atom({
   key: 'userDataSearch',
   default: ''
@@ -81,21 +101,47 @@ export const filteredUserDataSelector = selector({
   get: ({ get }) => {
     const userData = get(userDataAtom);
     const search = get(userDataSearchAtom);
+    const headers = get(activeHeadersSelector);
     //filtering
     return userData.filter((item) => {
       const searchLowerCase = search.toLowerCase();
-      return (
-        searchLowerCase === '' ||
-        item.id.toString().includes(searchLowerCase) ||
-        item.first_name.toLowerCase().includes(searchLowerCase) ||
-        item.last_name.toLowerCase().includes(searchLowerCase) ||
-        item.email.toLowerCase().includes(searchLowerCase) ||
-        item.phone.toLowerCase().includes(searchLowerCase) ||
-        item.city.toLowerCase().includes(searchLowerCase) ||
-        item.country.toLowerCase().includes(searchLowerCase) ||
-        item.dob.toLowerCase().includes(searchLowerCase)
-      );
+      if (searchLowerCase === '') return true;
+      let res = false;
+      headers.forEach(header => {
+        if (item[header].toString().toLowerCase().includes(searchLowerCase)) res = true;
+      });
+      return res;
     });
-    
+
   }
+});
+
+export const searchFieldAtom = atom({
+  key: 'searchField',
+  default: ''
+});
+
+export const searchTextAtom = atom({
+  key: 'searchText',
+  default: ''
+});
+
+export const fieldFilteredUserDataSelector = selector({
+  key: 'fieldFilteredUserData',
+  get: ({ get }) => {
+    const userData = get(filteredUserDataSelector);
+    const field = get(searchFieldAtom);
+    const search = get(searchTextAtom);
+
+    //filter
+    return userData.filter((item) => {
+      const searchLowerCase = search.toLowerCase();
+      return searchLowerCase === '' || item[field].toLowerCase().includes(searchLowerCase);
+    })
+  }
+});
+
+export const enableColumnHiderAtom = atom({
+  key: 'enableColumnHider',
+  default: false
 });
