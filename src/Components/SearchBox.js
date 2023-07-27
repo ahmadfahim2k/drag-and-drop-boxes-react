@@ -12,7 +12,9 @@ function SearchBox({ header }) {
     };
 
     useEffect(() => {
-        setLocalSearchFilters(prev => ({ ...prev, [header]: ''}));
+        return () => {
+            setLocalSearchFilters(prev => ({ ...prev, [header]: ''}));
+        }
         //eslint-disable-next-line
     }, []);
 

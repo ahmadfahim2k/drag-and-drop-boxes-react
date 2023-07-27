@@ -16,7 +16,7 @@ function ColumnHider() {
   }
 
   return (
-    <div className='absolute top-10 left-0 w-full select-none bg-red-500 rounded-lg flex flex-col justify-around items-center'>
+    <div className='absolute top-10 left-0 w-full select-none bg-slate-400 rounded-lg flex flex-col justify-around items-center'>
       {headers.map(header => {
         const isChecked = activeColumns.includes(header);
         return (
