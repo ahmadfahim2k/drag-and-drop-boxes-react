@@ -63,6 +63,7 @@ export const userDataAtom = atom({
   ]
 });
 
+//all the headers in userData
 export const userDataHeadersSelector = selector({
   key: 'userDataHeaders',
   get: ({ get }) => {
@@ -73,13 +74,15 @@ export const userDataHeadersSelector = selector({
   }
 });
 
+//headers that should be active
 export const activeColumnsAtom = atom({
   key: 'activeColumns',
   default: [
-    "id", "first_name", "last_name", "email", "phone", "city", "country","dob"
+    "id", "first_name", "last_name", "email", "phone", "city", "country", "dob"
   ]
 });
 
+//combining previous 2 functions to get the active headers in order.
 export const activeHeadersSelector = selector({
   key: 'activeHeaders',
   get: ({ get }) => {
@@ -91,16 +94,18 @@ export const activeHeadersSelector = selector({
   }
 })
 
-export const userDataSearchAtom = atom({
-  key: 'userDataSearch',
+//global search
+export const globalSearchFilterAtom = atom({
+  key: 'globalSearchFilter',
   default: ''
 });
 
+//remove the inactive headers, and global filter the remaining data
 export const filteredUserDataSelector = selector({
   key: 'filteredUserDataSelector',
   get: ({ get }) => {
     const userData = get(userDataAtom);
-    const search = get(userDataSearchAtom);
+    const search = get(globalSearchFilterAtom);
     const headers = get(activeHeadersSelector);
     //filtering
     return userData.filter((item) => {
@@ -116,31 +121,45 @@ export const filteredUserDataSelector = selector({
   }
 });
 
-export const searchFieldAtom = atom({
-  key: 'searchField',
-  default: ''
+//object containing the field: text
+export const localSearchFiltersAtom = atom({
+  key: 'localSearchFilters',
+  default: {}
 });
 
-export const searchTextAtom = atom({
-  key: 'searchText',
-  default: ''
+//returns search field for given field or undefined if not exists
+export const localSearchFilterSelector = selectorFamily({
+  key: 'localSearchFilter',
+  get: (field) => ({ get }) => {
+    const allFilters = get(localSearchFiltersAtom);
+    if(allFilters[field]) return allFilters[field];
+    else return '';
+  }
 });
 
+//Again filter the data based on local col filter.
 export const fieldFilteredUserDataSelector = selector({
   key: 'fieldFilteredUserData',
   get: ({ get }) => {
     const userData = get(filteredUserDataSelector);
-    const field = get(searchFieldAtom);
-    const search = get(searchTextAtom);
+    const filters = get(localSearchFiltersAtom);
+    const headers = get(activeHeadersSelector);
 
     //filter
     return userData.filter((item) => {
-      const searchLowerCase = search.toLowerCase();
-      return searchLowerCase === '' || item[field].toLowerCase().includes(searchLowerCase);
-    })
+      let valid = true;
+      // console.log(headers, filters);
+      headers.forEach(header => {
+          if(!filters[header] || !valid) return;
+          const searchLowerCase = filters[header].toLowerCase();
+          valid = searchLowerCase === '' || item[header].toLowerCase().includes(searchLowerCase);
+      })
+      return valid;
+    });
   }
 });
 
+//toggle the column hider menu
 export const enableColumnHiderAtom = atom({
   key: 'enableColumnHider',
   default: false

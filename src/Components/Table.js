@@ -10,8 +10,8 @@ function Table() {
   // ["id", "first_name", "last_name", "email", "phone", "city", "country", "dob"]
 
   return (
-    <div className="overflow-x-auto">
-      <table className="mt-8 min-w-full divide-y divide-gray-300">
+    <div className="overflow-auto m-4  border-2 border-black">
+      <table className="min-w-full divide-y divide-gray-300">
         <thead>
           <tr>
             {headers.map((data, idx) => {

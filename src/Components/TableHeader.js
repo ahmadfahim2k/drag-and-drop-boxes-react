@@ -1,30 +1,27 @@
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SearchBox from './SearchBox';
-import { useRecoilState, useResetRecoilState } from 'recoil';
-import { searchFieldAtom } from '../Recoil';
+import { useState } from 'react';
 
 function TableHeader({ header }) {
 
-    const [searchField, setSearchField] = useRecoilState(searchFieldAtom);
-    const resetSearchField = useResetRecoilState(searchFieldAtom);
+    const [searchActive, setSearchActive] = useState(false);
 
     function formatString(str) {
         return str.replace(/\b\w/g, (match) => match.toUpperCase());
     }
 
     function handleClick() {
-        if(searchField === header) resetSearchField();
-        else setSearchField(header);
+        setSearchActive(prev => !prev);
     }
 
     return (
-        <th className="px-4 py-2 border-t-2 border-black">
-            <div className='flex flex-row justify-center items-center'>
-                {searchField === header ? <SearchBox /> :
+        <th className="px-4 py-2 flex-auto border-r-2 border-slate-300">
+            <div className='h-8 flex flex-row justify-between items-center'>
+                {searchActive ? <SearchBox header={header} /> :
                     <span className='font-semibold text-gray-700 select-none'>{formatString(header)}</span>
                 }
-                <FontAwesomeIcon className='mx-2 cursor-pointer' onClick={handleClick} icon={faMagnifyingGlass} />
+                <FontAwesomeIcon className='px-2 cursor-pointer' onClick={handleClick} icon={faMagnifyingGlass} />
             </div>
         </th>
     )
